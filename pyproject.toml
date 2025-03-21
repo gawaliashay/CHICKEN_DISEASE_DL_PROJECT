@@ -1,0 +1,44 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DL_PROJECT"  # Name of your project
+version = "0.0.1"  # Version of your project
+authors = [
+  { name = "Ashay", email = "gawali.ashay@gmail.com" }
+]
+description = "Project on CHICKEN DISEASE (COCCIDIOSIS) CLASSIFICATION USING FICAL IMAGES"
+readme = "README.md"  # Adjusted path to README in the project root directory
+requires-python = ">=3.12"  # Minimum Python version required
+dependencies = [
+        "pandas",
+        "notebook",
+        "numpy",
+        "scikit-learn",
+        "matplotlib",
+        "python-box",
+        "pyYAML",
+        "tqdm",
+        "ensure",
+        "joblib",
+        "types-PyYAML",
+        "Flask",
+        "Flask-Cors",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+homepage = "https://github.com/gawaliashay/CHICKEN_DISEASE_DL_PROJECT"
+issues = "https://github.com/gawaliashay/CHICKEN_DISEASE_DL_PROJECT/issues"
+
+[tool.setuptools.packages.find]
+where = ["dl_project"]  # Set to "ml_project", as it is the root-level package
+include = ["dl_project.*"]
+exclude = ["tests.*"]
