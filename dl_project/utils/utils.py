@@ -12,30 +12,47 @@ import base64
 
 
 
-@ensure_annotations
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
-    """reads yaml file and returns
+    """Reads a YAML file and returns its content wrapped in a ConfigBox.
 
     Args:
-        path_to_yaml (str): path like input
+        path_to_yaml (Path): Path to the YAML file.
 
     Raises:
-        ValueError: if yaml file is empty
-        e: empty file
+        FileNotFoundError: If the YAML file does not exist.
+        ValueError: If YAML file is empty or has syntax errors.
+        Exception: Any other unexpected errors.
 
     Returns:
-        ConfigBox: ConfigBox type
+        ConfigBox: Parsed YAML content wrapped in a ConfigBox for easier access.
     """
     try:
-        with open(path_to_yaml) as yaml_file:
+        # Ensure the input is a Path object
+        path_to_yaml = Path(path_to_yaml)
+
+        # Check if the file exists
+        if not path_to_yaml.exists():
+            raise FileNotFoundError(f"YAML file '{path_to_yaml}' does not exist.")
+
+        # Read and parse the YAML file
+        with open(path_to_yaml, "r", encoding="utf-8") as yaml_file:
             content = yaml.safe_load(yaml_file)
-            logger.info(f"yaml file: {path_to_yaml} loaded successfully")
-            return ConfigBox(content)
-    except BoxValueError:
-        raise ValueError("yaml file is empty")
+
+            # Check if the YAML file is empty
+            if content is None:
+                raise ValueError(f"YAML file '{path_to_yaml}' is empty.")
+
+            logger.info(f"YAML file '{path_to_yaml}' loaded successfully")
+            return ConfigBox(content)  # Wrap the dictionary in a ConfigBox
+
+    except yaml.YAMLError as e:
+        logger.error(f"YAML parsing error in file '{path_to_yaml}': {e}")
+        raise ValueError(f"YAML parsing error in file '{path_to_yaml}': {e}")
     except Exception as e:
+        logger.error(f"Unexpected error while reading YAML file '{path_to_yaml}': {e}")
         raise e
-    
+
+
 
 
 @ensure_annotations

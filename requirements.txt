@@ -2,7 +2,7 @@ pandas
 notebook
 numpy
 scikit-learn
-matplotlib
+tensorflow
 python-box
 pyYAML
 tqdm
@@ -11,4 +11,4 @@ joblib
 types-PyYAML
 Flask
 Flask-Cors
--e .
+#-e .

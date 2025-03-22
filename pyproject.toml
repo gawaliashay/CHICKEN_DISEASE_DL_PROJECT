@@ -12,14 +12,12 @@ authors = [
 ]
 description = "Project on CHICKEN DISEASE (COCCIDIOSIS) CLASSIFICATION USING FICAL IMAGES"
 readme = "README.md"  # Adjusted path to README in the project root directory
-requires-python = ">=3.12"  # Minimum Python version required
+requires-python = ">=3.9, <3.12"  # Minimum Python version required
 dependencies = [
         "pandas",
         "notebook",
         "numpy",
         "scikit-learn",
-        "matplotlib",
-        "python-box",
         "pyYAML",
         "tqdm",
         "ensure",
