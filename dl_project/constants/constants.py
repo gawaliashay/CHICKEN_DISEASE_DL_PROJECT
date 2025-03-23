@@ -11,5 +11,7 @@ PARAMS_FILE_PATH = Path("config/params.yaml")
 
 ZIPPED_DATA_FILE: str = "data.zip"
 
-BASE_MODEL_FILE: str = "base_model.h5"
-UPDATED_BASE_MODEL_FILE: str = "base_model_updated.h5"
+BASE_MODEL_FILE: str = "base_model.keras"
+UPDATED_BASE_MODEL_FILE: str = "base_model_updated.keras"
+
+TRAINED_MODEL_FILE: str = "model.keras"

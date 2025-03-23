@@ -6,8 +6,12 @@ from dl_project.base.logger import logger
 from box import ConfigBox
 from dl_project.base.exceptions import CustomException  # Import CustomException
 from dl_project.utils.utils import create_directories, read_yaml
-from dl_project.artifacts_mgr.artifact_config import DataIngestionConfig, PrepareBaseModelConfig
-from dl_project.artifacts_mgr.artifact_entity import DataIngestionArtifacts, PrepareBaseModelArtifacts
+from dl_project.artifacts_mgr.artifact_config import (DataIngestionConfig, 
+                                                      PrepareBaseModelConfig,
+                                                      ModelTrainerConfig)
+from dl_project.artifacts_mgr.artifact_entity import (DataIngestionArtifacts,
+                                                       PrepareBaseModelArtifacts,
+                                                       ModelTrainerArtifacts)
 import sys  # Import sys to pass it to CustomException
 
 
@@ -15,12 +19,17 @@ class ConfigurationManager:
     def __init__(self, data_ingestion_config=DataIngestionConfig, 
                  data_ingestion_artifacts=DataIngestionArtifacts, 
                  prepare_base_model_config=PrepareBaseModelConfig, 
-                 prepare_base_model_artifacts=PrepareBaseModelArtifacts):
+                 prepare_base_model_artifacts=PrepareBaseModelArtifacts,
+                 model_trainer_config=ModelTrainerConfig,
+                 model_trainer_artifacts=ModelTrainerArtifacts):
         
         self.data_ingestion_config = data_ingestion_config
         self.data_ingestion_artifacts = data_ingestion_artifacts
         self.prepare_base_model_config = prepare_base_model_config
         self.prepare_base_model_artifacts = prepare_base_model_artifacts
+        self.model_trainer_config = model_trainer_config
+        self.model_trainer_artifacts = model_trainer_artifacts
+
 
         self.config = ARTIFACT_CONFIG_FILE_PATH
         self.params =  read_yaml(PARAMS_FILE_PATH)
@@ -98,3 +107,32 @@ class ConfigurationManager:
         except Exception as e:
             logger.error(f"Error occurred while preparing base model artifacts: {e}")
             raise CustomException(e, sys)  # Raise CustomException with the original exception
+        
+
+    def get_training_config(self) -> ModelTrainerArtifacts:
+
+        try:
+            config = self.model_trainer_config
+            prepare_base_model = self.prepare_base_model_config
+            params = self.params
+            training_data = os.path.join(self.data_ingestion_config.Local_data_path, "Chicken-fecal-images")
+            create_directories([
+                Path(config.root_dir)
+            ])
+
+            model_trainer_artifacts = ModelTrainerArtifacts(
+                root_dir=Path(config.root_dir),
+                trained_model_path=Path(config.trained_model_path),
+                updated_base_model_path=Path(prepare_base_model.updated_base_model_path),
+                training_data=Path(training_data),
+                params_epochs=params["EPOCHS"],
+                params_batch_size=params["BATCH_SIZE"],
+                params_is_augmentation=params["AUGMENTATION"],
+                params_image_size=params["IMAGE_SIZE"]
+            )
+
+            return model_trainer_artifacts 
+
+        except Exception as e:  
+            logger.error(f"Error occurred while preparing model training artifacts: {e}")
+            raise CustomException(e, sys)  

@@ -24,3 +24,7 @@ class PrepareBaseModelConfig:
     root_dir: Path = Path(os.path.join(artifacts_dir, "prepare_base_model"))
     base_model_path: Path = Path(os.path.join(root_dir/BASE_MODEL_FILE))
     updated_base_model_path: Path = Path(os.path.join(root_dir/UPDATED_BASE_MODEL_FILE))
+
+class ModelTrainerConfig:
+    root_dir: Path = Path(os.path.join(artifacts_dir, "train_model"))
+    trained_model_path: Path = Path(os.path.join(root_dir, TRAINED_MODEL_FILE))
