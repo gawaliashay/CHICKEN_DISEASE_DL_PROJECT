@@ -11,4 +11,6 @@ joblib
 types-PyYAML
 Flask
 Flask-Cors
+mlflow
+dvc
 #-e .

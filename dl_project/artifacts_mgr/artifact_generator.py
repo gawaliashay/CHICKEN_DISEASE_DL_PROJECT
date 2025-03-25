@@ -3,15 +3,16 @@
 import os
 from dl_project.constants.constants import *
 from dl_project.base.logger import logger
-from box import ConfigBox
 from dl_project.base.exceptions import CustomException  # Import CustomException
 from dl_project.utils.utils import create_directories, read_yaml
 from dl_project.artifacts_mgr.artifact_config import (DataIngestionConfig, 
                                                       PrepareBaseModelConfig,
-                                                      ModelTrainerConfig)
+                                                      ModelTrainerConfig,
+                                                      ModelEvaluationConfig)
 from dl_project.artifacts_mgr.artifact_entity import (DataIngestionArtifacts,
                                                        PrepareBaseModelArtifacts,
-                                                       ModelTrainerArtifacts)
+                                                       ModelTrainerArtifacts,
+                                                       ModelEvaluationArtifacts)
 import sys  # Import sys to pass it to CustomException
 
 
@@ -21,7 +22,9 @@ class ConfigurationManager:
                  prepare_base_model_config=PrepareBaseModelConfig, 
                  prepare_base_model_artifacts=PrepareBaseModelArtifacts,
                  model_trainer_config=ModelTrainerConfig,
-                 model_trainer_artifacts=ModelTrainerArtifacts):
+                 model_trainer_artifacts=ModelTrainerArtifacts,
+                 model_evaluation_config=ModelEvaluationConfig,
+                 model_evaluation_artifacts=ModelEvaluationArtifacts):
         
         self.data_ingestion_config = data_ingestion_config
         self.data_ingestion_artifacts = data_ingestion_artifacts
@@ -29,6 +32,8 @@ class ConfigurationManager:
         self.prepare_base_model_artifacts = prepare_base_model_artifacts
         self.model_trainer_config = model_trainer_config
         self.model_trainer_artifacts = model_trainer_artifacts
+        self.model_evaluation_config = model_evaluation_config
+        self.model_evaluation_artifacts = model_evaluation_artifacts
 
 
         self.config = ARTIFACT_CONFIG_FILE_PATH
@@ -109,11 +114,10 @@ class ConfigurationManager:
             raise CustomException(e, sys)  # Raise CustomException with the original exception
         
 
-    def get_training_config(self) -> ModelTrainerArtifacts:
+    def get_training_artifacts(self) -> ModelTrainerArtifacts:
 
         try:
             config = self.model_trainer_config
-            prepare_base_model = self.prepare_base_model_config
             params = self.params
             training_data = os.path.join(self.data_ingestion_config.Local_data_path, "Chicken-fecal-images")
             create_directories([
@@ -123,7 +127,7 @@ class ConfigurationManager:
             model_trainer_artifacts = ModelTrainerArtifacts(
                 root_dir=Path(config.root_dir),
                 trained_model_path=Path(config.trained_model_path),
-                updated_base_model_path=Path(prepare_base_model.updated_base_model_path),
+                updated_base_model_path=Path(self.prepare_base_model_config.updated_base_model_path),
                 training_data=Path(training_data),
                 params_epochs=params["EPOCHS"],
                 params_batch_size=params["BATCH_SIZE"],
@@ -136,3 +140,25 @@ class ConfigurationManager:
         except Exception as e:  
             logger.error(f"Error occurred while preparing model training artifacts: {e}")
             raise CustomException(e, sys)  
+        
+    def get_evaluation_artifacts(self) -> ModelEvaluationArtifacts:
+
+        try: 
+            config = self.model_evaluation_config
+            create_directories([Path(config.root_dir)])
+
+            training_data = os.path.join(self.data_ingestion_config.Local_data_path, "Chicken-fecal-images")
+
+            eval_config = ModelEvaluationArtifacts(
+            path_of_model=self.prepare_base_model_config.updated_base_model_path,
+            training_data=training_data,
+            mlflow_uri=MLFLOW_URI,
+            all_params=self.params,
+            params_image_size=self.params["IMAGE_SIZE"],
+            params_batch_size=self.params["BATCH_SIZE"]
+            )
+            return eval_config
+        
+        except Exception as e:
+            logger.error(f"Error occurred while preparing model evaluation artifacts: {e}") 
+            raise CustomException(e, sys)
